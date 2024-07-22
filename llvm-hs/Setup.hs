@@ -134,7 +134,8 @@ main = do
       includeDirs <- liftM lines $ llvmConfig ["--includedir"]
       libDirs <- liftM lines $ llvmConfig ["--libdir"]
       [llvmVersion] <- liftM lines $ llvmConfig ["--version"]
-      let getLibs = liftM (map (fromJust . stripPrefix "-l") . words) . llvmConfig
+      let normalizeLib = reverse . takeWhile (/='\\') . drop 4 . reverse
+          getLibs  = liftM (map normalizeLib . words) . llvmConfig
           flags    = configConfigurationsFlags confFlags
           linkFlag = case lookupFlagAssignment (mkFlagName "shared-llvm") flags of
                        Nothing     -> "--link-shared"
